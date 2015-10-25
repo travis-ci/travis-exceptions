@@ -5,14 +5,14 @@ module Travis
     class << self
       attr_reader :reporter
 
-      def setup(context)
-        @reporter = Reporter.new(context.config.to_h, context.env, context.logger)
+      def setup(config, env, logger)
+        @reporter = Reporter.new(config.to_h, env, logger)
         reporter.start
         reporter
       end
 
       def handle(error)
-        reporter.handle(error)
+        reporter ? reporter.handle(error) : puts("Error reporter not set up. Call Travis::Exceptions.setup")
       end
     end
   end

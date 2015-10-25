@@ -1,4 +1,3 @@
-# require 'core_ext/hash/slice'
 # require 'core_ext/module/prepend_to'
 #
 # module Travis
