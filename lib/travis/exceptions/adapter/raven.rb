@@ -12,12 +12,14 @@ module Travis
             c.dsn    = config[:sentry][:dsn]
             c.ssl    = config[:ssl] if config[:ssl]
             c.logger = logger
+            c.tags   = { environment: env }
             c.current_environment = env
+            c.environments = %w(staging production)
           end
         end
 
-        def handle(error, meta = {})
-          ::Raven.capture_exception(error, extra: meta)
+        def handle(error, extra = {}, tags = {})
+          ::Raven.capture_exception(error, extra: extra, tags: tags)
         end
       end
     end

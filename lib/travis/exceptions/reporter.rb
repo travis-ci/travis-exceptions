@@ -12,8 +12,8 @@ module Travis
         @queue = Queue.new
       end
 
-      def handle(error)
-        queue.push(error)
+      def handle(*args)
+        queue.push(args)
       end
 
       def start
@@ -28,14 +28,10 @@ module Travis
           end
         end
 
-        def report(error)
+        def report(args)
           adapters.each do |adapter|
-            adapter.handle(error, metadata_for(error))
+            adapter.handle(*args)
           end
-        end
-
-        def metadata_for(error)
-          error.respond_to?(:metadata) ? error.metadata : {}
         end
 
         def failsafe

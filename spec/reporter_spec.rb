@@ -23,18 +23,8 @@ describe Travis::Exceptions::Reporter do
 
   describe 'with a sentry dsn' do
     let(:config) { { sentry: { dsn: 'dsn' } } }
-    before { Raven.expects(:capture_exception).with(error, extra: extra) }
-
-    describe 'without metadata' do
-      let(:extra) { {} }
-      it { handle_error }
-    end
-
-    describe 'with metadata' do
-      let(:extra) { { meta: :data } }
-      before { error.stubs(:metadata).returns(extra) }
-      it { handle_error }
-    end
+    before { Raven.expects(:capture_exception).with(error, extra: {}, tags: {}) }
+    it { handle_error }
   end
 
   describe 'an error raised during exception handling' do
