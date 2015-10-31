@@ -7,7 +7,11 @@ module Travis
   module Exceptions
     module Adapter
       class Raven
+        attr_reader :logger
+
         def initialize(config, env, logger)
+          @logger = logger
+
           ::Raven.configure do |c|
             c.dsn    = config[:sentry][:dsn]
             c.ssl    = config[:ssl] if config[:ssl]
@@ -20,6 +24,9 @@ module Travis
 
         def handle(error, extra = {}, tags = {})
           ::Raven.capture_exception(error, extra: extra, tags: tags)
+        rescue Exception => e
+          logger.error("Sending error to Sentry failed: #{e.message}")
+          logger.error(e.backtrace.join("\n"))
         end
       end
     end
