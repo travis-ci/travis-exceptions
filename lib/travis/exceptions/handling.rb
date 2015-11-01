@@ -3,16 +3,16 @@
 # module Travis
 #   module Exceptions
 #     module Handling
-#       def rescues(name, options = {})
+#       def rescues(name, opts = {})
 #         prepend_to(name) do |object, method, *args, &block|
 #           if Travis.env == 'test'
 #             method.call(*args, &block)
 #           else
 #             begin
 #               method.call(*args, &block)
-#             rescue options[:from] || Exception => e
+#             rescue opts[:from] || Exception => e
 #               Exceptions.handle(e)
-#               raise if options[:raise] && Array(options[:raise]).include?(e.class)
+#               raise if opts[:raise] && Array(opts[:raise]).include?(e.class)
 #             end
 #           end
 #         end

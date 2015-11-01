@@ -4,16 +4,26 @@ require 'travis/exceptions/adapter'
 module Travis
   module Exceptions
     class Reporter < Struct.new(:config, :env, :logger)
-      attr_reader :queue, :adapters
+      OPTIONS = { level: :error, extra: {}, tags: {} }
+
+      class << self
+        def setup(config, env, logger)
+          Adapter.adapters_for(config).each do |const|
+            const.setup(config, env, logger) if const.respond_to?(:setup)
+          end
+        end
+      end
+
+      attr_reader :adapters, :queue
 
       def initialize(*)
         super
-        @adapters = Adapter.adapters_for(config, env, logger)
+        @adapters = Adapter.adapters_for(config).map { |const| const.new(config, env, logger) }
         @queue = Queue.new
       end
 
-      def handle(*args)
-        queue.push(args)
+      def handle(error, opts = {})
+        queue.push([error, opts])
       end
 
       def start
@@ -24,14 +34,23 @@ module Travis
 
         def process
           failsafe do
-            report(queue.pop)
+            error, opts = *queue.pop
+            report(error, normalize(error, opts))
           end
         end
 
-        def report(args)
+        def report(error, opts)
           adapters.each do |adapter|
-            adapter.handle(*args)
+            adapter.handle(error, opts)
           end
+        end
+
+        def normalize(error, opts)
+          opts = OPTIONS.merge(opts)
+          opts[:level] = error.level                    if error.respond_to?(:level)
+          opts[:extra] = opts[:extra].merge(error.data) if error.respond_to?(:data)
+          opts[:tags]  = opts[:tags].merge(error.tags)  if error.respond_to?(:tags)
+          opts
         end
 
         def failsafe
