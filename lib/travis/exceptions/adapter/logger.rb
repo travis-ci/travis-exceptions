@@ -9,7 +9,7 @@ module Travis
           log level, error.message
           log level, to_pairs(opts[:tags])  if opts[:tags]
           log level, to_pairs(opts[:extra]) if opts[:extra]
-          log level, error.backtrace if logger.level == DEBUG
+          log level, error.backtrace
         end
 
         private
