@@ -6,6 +6,7 @@ module Travis
       attr_reader :reporter
 
       def setup(config, env, logger)
+        Reporter.setup(config, env, logger)
         @reporter = Reporter.new(config.to_h, env, logger)
         reporter.start
         reporter
