@@ -17,8 +17,8 @@ module Travis
               c.dsn    = config[:sentry][:dsn]
               c.ssl    = config[:ssl] if config[:ssl]
               c.tags   = { environment: env }
-              c.current_environment = env
-              c.environments = %w(staging production)
+              c.current_environment = env.to_s
+              # c.environments = %w(staging production)
             end
           end
         end
