@@ -4,8 +4,8 @@ rescue LoadError
 end
 
 module Travis
-  module Exceptions
-    module Adapter
+  class Exceptions
+    class Reporter
       class Metrics < Struct.new(:config, :env, :logger)
         MSGS = {
           error: 'Storing metric failed: %s'

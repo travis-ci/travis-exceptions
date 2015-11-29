@@ -1,6 +1,6 @@
 module Travis
-  module Exceptions
-    module Adapter
+  class Exceptions
+    class Reporter
       class Logger < Struct.new(:config, :env, :logger)
         DEBUG = 0
 

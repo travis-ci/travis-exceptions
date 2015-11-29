@@ -1,7 +1,7 @@
 # require 'core_ext/module/prepend_to'
 #
 # module Travis
-#   module Exceptions
+#   class Exceptions
 #     module Handling
 #       def rescues(name, opts = {})
 #         prepend_to(name) do |object, method, *args, &block|

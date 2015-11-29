@@ -1,7 +1,7 @@
 require 'raven'
 
 module Travis
-  module Exceptions
+  class Exceptions
     class Sidekiq < Struct.new(:env, :logger)
       def call(worker, message, queue)
         yield
