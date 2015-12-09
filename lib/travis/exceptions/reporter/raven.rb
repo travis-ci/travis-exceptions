@@ -31,6 +31,7 @@ module Travis
               c.tags = { environment: env }
               c.current_environment = env.to_s
               c.environments = %w(staging production)
+              c.excluded_exceptions.clear
             end
           end
 
