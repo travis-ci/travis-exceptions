@@ -8,6 +8,7 @@ module Travis
     class Reporter
       class Raven < Struct.new(:config, :env, :logger)
         MSGS = {
+          setup: 'Setting up Raven with dsn: %s, env: %s',
           error: 'Sending error to Sentry failed: %s'
         }
 
@@ -25,6 +26,8 @@ module Travis
         private
 
           def setup
+            logger.info(MSGS[:setup] % [strip_password(config[:sentry][:dsn]), env])
+
             ::Raven.configure do |c|
               c.dsn  = config[:sentry][:dsn]
               c.ssl  = config[:ssl] if config[:ssl]
@@ -33,6 +36,11 @@ module Travis
               c.environments = %w(staging production)
               c.excluded_exceptions.clear
             end
+          end
+
+          def strip_password(dsn)
+            tokens = dsn.scan(%r(https://(.+):(.+)@[\w]+.[\w]+.[\w]+/[\d]+)).flatten
+            tokens.inject(dsn) { |dsn, token| dsn.sub(token, 'REDACTED') }
           end
 
           def slice(hash, *keys)
