@@ -6,7 +6,8 @@ module Travis
       def call(worker, message, queue)
         yield
       rescue Exception => error
-        handle(error, queue: queue, worker: worker.to_s, env: env) if retried?(message)
+        logger.error(error.to_s) if logger
+        report(error, queue: queue, worker: worker.to_s, env: env) if retried?(message)
         raise
       end
 
@@ -16,7 +17,7 @@ module Travis
           message['retry_count'].to_i >= 1
         end
 
-        def handle(error, extra)
+        def report(error, extra)
           Raven.capture_exception(error, extra: extra)
         end
     end
