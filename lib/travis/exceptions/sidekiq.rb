@@ -14,7 +14,7 @@ module Travis
       private
 
         def retried?(message)
-          message['retry_count'].to_i >= 1
+          message.key?('retry_count')
         end
 
         def report(error, extra)
