@@ -29,6 +29,7 @@ module Travis
             logger.info(MSGS[:setup] % [strip_password(config[:sentry][:dsn]), env])
 
             ::Raven.configure do |c|
+              c.logger = logger
               c.dsn  = config[:sentry][:dsn]
               c.ssl  = config[:ssl] if config[:ssl]
               c.tags = { environment: env }
