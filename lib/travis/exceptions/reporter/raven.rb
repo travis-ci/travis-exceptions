@@ -18,7 +18,7 @@ module Travis
         end
 
         def handle(error, opts = {})
-          ::Raven.capture_exception(error, slice(opts, :level, :extra, :tags))
+          ::Raven.capture_exception(error, level: opts[:level], extra: opts[:extra], tags: opts[:tags])
         rescue Exception => e
           log_error(e)
         end
