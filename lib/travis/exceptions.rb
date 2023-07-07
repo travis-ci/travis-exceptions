@@ -3,7 +3,7 @@ require 'travis/exceptions/reporter'
 
 module Travis
   class Exceptions
-    class << self
+    class << Exceptions
       attr_reader :instance
 
       def setup(config, env, logger)

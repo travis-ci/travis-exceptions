@@ -1,6 +1,5 @@
-# encoding: utf-8
-
-$:.unshift File.expand_path('../lib', __FILE__)
+# frozen_string_literal: true
+$:.unshift File.expand_path('lib', __dir__)
 require 'travis/exceptions/version'
 
 Gem::Specification.new do |s|
@@ -16,6 +15,7 @@ Gem::Specification.new do |s|
   s.platform      = Gem::Platform::RUBY
   s.require_paths = ['lib']
   s.rubyforge_project = '[none]'
+  s.required_ruby_version = '~> 3.2'
 
   s.add_dependency 'sentry-raven'
 end

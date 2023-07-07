@@ -2,7 +2,6 @@ sudo: false
 language: ruby
 
 rvm:
-  - 2.7
   - 3.2
 
 script: bundle exec rspec spec --color --format documentation --require spec_helper
