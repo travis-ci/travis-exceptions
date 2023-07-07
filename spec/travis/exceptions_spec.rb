@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'capture_stdout'
 require 'travis/logger'
 require 'travis/exceptions'
@@ -18,19 +20,24 @@ describe Travis::Exceptions do
 
   describe 'without a sentry dsn' do
     before { handle(error) }
+
     it { expect(log).to include('Error message') }
   end
 
   describe 'with a sentry dsn' do
     let(:config) { { sentry: { dsn: 'dsn' } } }
-    before { expect(Raven).to receive(:capture_exception).with(error, level: :error, extra: {}, tags: {}) }
+
+    before { allow(Raven).to receive(:capture_exception).with(error, level: :error, extra: {}, tags: {}) }
+
     it { handle(error) }
   end
 
   describe 'an error raised during exception handling' do
     let(:log) { capture_stdout { handle(error) } }
-    before { expect(handler.queue).to receive(:pop).and_raise(Exception.new('broken')) }
-    it { expect { log }.to_not raise_error }
+
+    before { allow(handler.queue).to receive(:pop).and_raise(Exception.new('broken')) }
+
+    it { expect { log }.not_to raise_error }
     it { expect(log).to include('Error while handling exception: broken') }
   end
 end

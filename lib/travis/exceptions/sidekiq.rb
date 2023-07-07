@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'raven'
 
 module Travis
@@ -5,21 +7,21 @@ module Travis
     class Sidekiq < Struct.new(:env, :logger)
       def call(worker, message, queue)
         yield
-      rescue Exception => error
-        logger.error(error.to_s) if logger
-        report(error, queue: queue, worker: worker.to_s, env: env) if retried?(message)
+      rescue Exception => e
+        logger&.error(e.to_s)
+        report(e, queue:, worker: worker.to_s, env:) if retried?(message)
         raise
       end
 
       private
 
-        def retried?(message)
-          message.key?('retry_count')
-        end
+      def retried?(message)
+        message.key?('retry_count')
+      end
 
-        def report(error, extra)
-          Raven.capture_exception(error, extra: extra)
-        end
+      def report(error, extra)
+        Raven.capture_exception(error, extra:)
+      end
     end
   end
 end

@@ -1,4 +1,5 @@
-require 'thread'
+# frozen_string_literal: true
+
 require 'travis/exceptions/reporter'
 
 module Travis
@@ -12,15 +13,17 @@ module Travis
         end
       end
 
-      [:fatal, :error, :warning, :info].each do |level|
+      %i[fatal error warning info].each do |level|
         define_method(level) do |error, opts = {}|
           return puts('Exception handling not set up. Call Travis::Exceptions.setup') unless instance
+
           instance.send(level, error, opts)
         end
       end
 
       def handle(error, opts = {})
         return puts('Exception handling not set up. Call Travis::Exceptions.setup') unless instance
+
         instance.handle(error, opts)
       end
     end
@@ -32,9 +35,9 @@ module Travis
       @queue = Queue.new
     end
 
-    [:fatal, :error, :warning, :info].each do |level|
+    %i[fatal error warning info].each do |level|
       define_method(level) do |error, opts = {}|
-        handle(error, opts.merge(level: level))
+        handle(error, opts.merge(level:))
       end
     end
 
@@ -43,22 +46,22 @@ module Travis
     end
 
     def start
-      @thread = Thread.new { loop &method(:process) }
+      @thread = Thread.new { loop(&method(:process)) }
     end
 
     private
 
-      def process
-        failsafe { reporter.handle(*queue.pop) }
-      end
+    def process
+      failsafe { reporter.handle(*queue.pop) }
+    end
 
-      def failsafe
-        yield
-      rescue Exception => e
-        puts '---- FAILSAFE ----'
-        puts "Error while handling exception: #{e.message}"
-        puts e.backtrace
-        puts '------------------'
-      end
+    def failsafe
+      yield
+    rescue Exception => e
+      puts '---- FAILSAFE ----'
+      puts "Error while handling exception: #{e.message}"
+      puts e.backtrace
+      puts '------------------'
+    end
   end
 end

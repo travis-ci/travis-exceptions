@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Travis
   class Exceptions
     class Reporter < Struct.new(:config, :env, :logger)
@@ -20,22 +22,22 @@ module Travis
 
       private
 
-        OPTS = { level: :error, extra: {}, tags: {} }
+      OPTS = { level: :error, extra: {}, tags: {} }.freeze
 
-        def normalize(error, opts)
-          opts = OPTS.merge(opts)
-          opts[:level] = error.level                    if error.respond_to?(:level)
-          opts[:extra] = opts[:extra].merge(error.data) if error.respond_to?(:data)
-          opts[:tags]  = opts[:tags].merge(error.tags)  if error.respond_to?(:tags)
-          opts
-        end
+      def normalize(error, opts)
+        opts = OPTS.merge(opts)
+        opts[:level] = error.level                    if error.respond_to?(:level)
+        opts[:extra] = opts[:extra].merge(error.data) if error.respond_to?(:data)
+        opts[:tags]  = opts[:tags].merge(error.tags)  if error.respond_to?(:tags)
+        opts
+      end
 
-        def consts
-          consts = [Logger]
-          consts << Raven   if config[:sentry]  && config[:sentry][:dsn]
-          consts << Metrics if config[:metrics] && config[:metrics][:adapter]
-          consts
-        end
+      def consts
+        consts = [Logger]
+        consts << Raven   if config[:sentry]  && config[:sentry][:dsn]
+        consts << Metrics if config[:metrics] && config[:metrics][:adapter]
+        consts
+      end
     end
   end
 end

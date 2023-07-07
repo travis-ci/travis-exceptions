@@ -1,5 +1,6 @@
 # frozen_string_literal: true
-$:.unshift File.expand_path('lib', __dir__)
+
+$LOAD_PATH.unshift File.expand_path('lib', __dir__)
 require 'travis/exceptions/version'
 
 Gem::Specification.new do |s|
