@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require 'raven'
-
 module Travis
   class Exceptions
     class Sidekiq < Struct.new(:env, :logger)

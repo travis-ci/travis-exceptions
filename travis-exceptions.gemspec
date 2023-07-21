@@ -18,5 +18,5 @@ Gem::Specification.new do |s|
   s.rubyforge_project = '[none]'
   s.required_ruby_version = '~> 3.2'
 
-  s.add_dependency 'sentry-raven'
+  s.add_dependency 'sentry-ruby'
 end

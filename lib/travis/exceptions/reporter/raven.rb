@@ -1,10 +1,5 @@
 # frozen_string_literal: true
 
-begin
-  require 'raven'
-rescue LoadError
-end
-
 module Travis
   class Exceptions
     class Reporter
@@ -20,7 +15,7 @@ module Travis
         end
 
         def handle(error, opts = {})
-          ::Raven.capture_exception(error, level: opts[:level], extra: opts[:extra], tags: opts[:tags])
+          ::Sentry.capture_exception(error, level: opts[:level], extra: opts[:extra], tags: opts[:tags])
         rescue Exception => e
           log_error(e)
         end
@@ -30,15 +25,16 @@ module Travis
         def setup
           logger.info(format(MSGS[:setup], strip_password(config[:sentry][:dsn]), env))
 
-          ::Raven.configure do |c|
+          ::Sentry.init do |c|
             c.logger = logger
             c.dsn  = config[:sentry][:dsn]
             c.ssl  = config[:ssl] if config[:ssl]
-            c.tags = { environment: env }
-            c.current_environment = env.to_s
-            c.environments = %w[staging production]
+            c.environment = env.to_s
+            c.enabled_environments = %w[staging production]
             c.excluded_exceptions.clear
           end
+
+          Sentry.set_tags environment: env
         end
 
         def strip_password(dsn)

@@ -3,6 +3,7 @@
 require 'capture_stdout'
 require 'travis/logger'
 require 'travis/exceptions'
+require 'sentry-ruby'
 
 describe Travis::Exceptions do
   let(:error)   { StandardError.new('Error message') }
@@ -27,7 +28,7 @@ describe Travis::Exceptions do
   describe 'with a sentry dsn' do
     let(:config) { { sentry: { dsn: 'dsn' } } }
 
-    before { allow(Raven).to receive(:capture_exception).with(error, level: :error, extra: {}, tags: {}) }
+    before { allow(Sentry).to receive(:capture_exception).with(error, level: :error, extra: {}, tags: {}) }
 
     it { handle(error) }
   end
