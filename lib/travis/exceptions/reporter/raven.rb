@@ -30,7 +30,7 @@ module Travis
           ::Sentry.init do |c|
             c.logger = logger
             c.dsn  = config[:sentry][:dsn]
-            c.ssl  = config[:ssl] if config[:ssl]
+            c.transport.ssl  = config[:ssl] if config[:ssl]
             c.environment = env.to_s
             c.enabled_environments = %w[staging production]
             c.excluded_exceptions.clear
