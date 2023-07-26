@@ -2,7 +2,7 @@
 
 require 'travis/exceptions'
 
-Raven.configure do |config|
+Sentry.init do |config|
   config.silence_ready = true
 end
 
