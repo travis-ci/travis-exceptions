@@ -18,7 +18,7 @@ module Travis
       end
 
       def report(error, extra)
-        Raven.capture_exception(error, extra:)
+        Sentry.capture_exception(error, extra:)
       end
     end
   end
