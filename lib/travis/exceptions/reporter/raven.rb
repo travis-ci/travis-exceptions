@@ -1,7 +1,6 @@
-begin
-  require 'raven'
-rescue LoadError
-end
+# frozen_string_literal: true
+
+require 'sentry-ruby'
 
 module Travis
   class Exceptions
@@ -10,7 +9,7 @@ module Travis
         MSGS = {
           setup: 'Setting up Raven with dsn: %s, env: %s',
           error: 'Sending error to Sentry failed: %s'
-        }
+        }.freeze
 
         def initialize(*)
           super
@@ -18,40 +17,41 @@ module Travis
         end
 
         def handle(error, opts = {})
-          ::Raven.capture_exception(error, slice(opts, :level, :extra, :tags))
+          ::Sentry.capture_exception(error, level: opts[:level], extra: opts[:extra], tags: opts[:tags])
         rescue Exception => e
           log_error(e)
         end
 
         private
 
-          def setup
-            logger.info(MSGS[:setup] % [strip_password(config[:sentry][:dsn]), env])
+        def setup
+          logger.info(format(MSGS[:setup], strip_password(config[:sentry][:dsn]), env))
 
-            ::Raven.configure do |c|
-              c.logger = logger
-              c.dsn  = config[:sentry][:dsn]
-              c.ssl  = config[:ssl] if config[:ssl]
-              c.tags = { environment: env }
-              c.current_environment = env.to_s
-              c.environments = %w(staging production)
-              c.excluded_exceptions.clear
-            end
+          ::Sentry.init do |c|
+            c.logger = logger
+            c.dsn  = config[:sentry][:dsn]
+            c.transport.ssl  = config[:ssl] if config[:ssl]
+            c.environment = env.to_s
+            c.enabled_environments = %w[staging production]
+            c.excluded_exceptions.clear
           end
 
-          def strip_password(dsn)
-            tokens = dsn.scan(%r(https://(.+):(.+)@[\w]+.[\w]+.[\w]+/[\d]+)).flatten
-            tokens.inject(dsn) { |dsn, token| dsn.sub(token, 'REDACTED') }
-          end
+          Sentry.set_tags environment: env
+        end
 
-          def slice(hash, *keys)
-            hash.select { |key, _| keys.include?(key) }
-          end
+        def strip_password(dsn)
+          tokens = dsn.scan(%r{https://(.+):(.+)@\w+.\w+.\w+/\d+}).flatten
+          tokens.inject(dsn) { |dsnval, token| dsnval.sub(token, 'REDACTED') }
+        end
 
-          def log_error(error)
-            logger.error(MSGS[:error] % error.message)
-            logger.error(error.backtrace.join("\n"))
-          end
+        def slice(hash, *keys)
+          hash.select { |key, _| keys.include?(key) }
+        end
+
+        def log_error(error)
+          logger.error(MSGS[:error] % error.message)
+          logger.error(error.backtrace.join("\n"))
+        end
       end
     end
   end
